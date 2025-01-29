@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Traductor a Mi Idioma</title>
+
+    <!-- Agregar imagen JPG como favicon -->
+    <link rel="icon" href="https://github.com/AlexL8000/T-P/blob/main/PI.png?raw=true" type="image/jpg">
+
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
+            background-color: #a8dadc;
             padding: 20px;
         }
         .container {
-            background: white;
+            background: #f1faee;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -35,10 +39,41 @@
         button:hover {
             background-color: #218838;
         }
+        #traductor {
+            display: none;
+        }
+        #resultado-container {
+            border: 2px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e9c46a;
+            margin-top: 10px;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+
+        /* Estilo para la imagen en la página de login */
+        #login img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="container" id="login">
+        <!-- Imagen en la parte superior del login -->
+        <img src="https://github.com/AlexL8000/T-P/blob/main/PI.png?raw=true" alt="Logo" id="logo" type="image/jpg">
+        
+        <h2>Iniciar Sesión</h2>
+        <input type="text" id="usuario" placeholder="Usuario">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="verificarLogin()">Ingresar</button>
+        <p id="mensaje" style="color: red;"></p>
+    </div>
+
+    <div class="container" id="traductor">
         <h2>Traductor a Mi Idioma</h2>
         <label for="direccion">Dirección de Traducción:</label>
         <select id="direccion">
@@ -47,14 +82,22 @@
         </select>
         <input type="text" id="entrada" placeholder="Ingrese texto...">
         <button onclick="traducir()">Traducir</button>
-        <p><strong>Resultado:</strong> <span id="resultado"></span></p>
+        
+        <p><strong>Resultado:</strong></p>
+        <div id="resultado-container">
+            <span id="resultado"></span>
+        </div>
+        
         <button onclick="pronunciar()">Pronunciar</button>
-        <h3>Agregar Nueva Palabra</h3>
-        <input type="text" id="original" placeholder="Palabra en Español">
-        <input type="text" id="traduccion" placeholder="Traducción en Mi Idioma">
-        <button onclick="agregarPalabra()">Agregar</button>
+
+        <br><br>
+        <button onclick="cerrarSesion()" style="background-color: red;">Cerrar Sesión</button>
     </div>
+
     <script>
+        const usuarioCorrecto = "admin";
+        const passwordCorrecto = "1234";
+
         let miIdioma = {
             "hola": "xylo",
             "adiós": "krano",
@@ -67,31 +110,38 @@
             "mal": "trapo"
         };
 
-        function traducir() {
-            let texto = document.getElementById("entrada").value.trim().toLowerCase();
-            let direccion = document.getElementById("direccion").value;
-            let palabras = texto.split(" ");
-            let resultado = palabras.map(palabra => {
-                if (direccion === "es-a-mi") {
-                    return miIdioma[palabra] || palabra;
-                } else {
-                    return Object.keys(miIdioma).find(key => miIdioma[key] === palabra) || palabra;
-                }
-            }).join(" ");
-            document.getElementById("resultado").textContent = resultado;
+        function verificarLogin() {
+            let usuario = document.getElementById("usuario").value.trim();
+            let password = document.getElementById("password").value.trim();
+
+            if (usuario === usuarioCorrecto && password === passwordCorrecto) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("traductor").style.display = "block";
+            } else {
+                document.getElementById("mensaje").textContent = "Usuario o contraseña incorrectos.";
+            }
         }
 
-        function agregarPalabra() {
-            let original = document.getElementById("original").value.trim().toLowerCase();
-            let traduccion = document.getElementById("traduccion").value.trim().toLowerCase();
-            if (original && traduccion) {
-                miIdioma[original] = traduccion;
-                alert(`Se agregó '${original}' como '${traduccion}'`);
-                document.getElementById("original").value = "";
-                document.getElementById("traduccion").value = "";
-            } else {
-                alert("Ambos campos deben estar llenos.");
-            }
+        function cerrarSesion() {
+            document.getElementById("traductor").style.display = "none";
+            document.getElementById("login").style.display = "block";
+            document.getElementById("usuario").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("mensaje").textContent = "";
+        }
+
+        function traducir() {
+            let texto = document.getElementById("entrada").value.trim();
+            let direccion = document.getElementById("direccion").value;
+            let palabras = texto.match(/\w+|[^\w\s]/g) || [];
+            let resultado = palabras.map(palabra => {
+                if (/^\w+$/.test(palabra)) {
+                    return direccion === "es-a-mi" ? (miIdioma[palabra.toLowerCase()] || palabra) : 
+                           (Object.keys(miIdioma).find(key => miIdioma[key] === palabra.toLowerCase()) || palabra);
+                }
+                return palabra;
+            }).join(" ");
+            document.getElementById("resultado").textContent = resultado;
         }
 
         function pronunciar() {
@@ -101,5 +151,6 @@
             window.speechSynthesis.speak(speech);
         }
     </script>
+
 </body>
 </html>
