@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>!ndi-Trad</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #003f8c;
+            color: white;
+            padding: 50px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+            color: black;
+        }
+        .login-image {
+            width: 200px;
+            height: 200px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+        input, button, select, textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        select {
+            background-color: #003f8c;
+            color: white;
+            font-weight: bold;
+            border: none;
+        }
+        textarea {
+            height: 80px;
+            resize: none;
+        }
+        button {
+            background-color: #0003cc;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #030099;
+        }
+        #resultado-container {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f8fa;
+            border-radius: 5px;
+        }
+        .btn-danger {
+            background-color: rgb(55, 0, 255);
+        }
+        .btn-danger:hover {
+            background-color: rgb(49, 0, 139);
+        }
+        #historial {
+            margin-top: 20px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            color: #333;
+        }
+        .historial-item {
+            margin-bottom: 5px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+        }
+        .vision-mision {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            text-align: left;
+            color: black;
+        }
+        .vision-mision h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .vision-mision p {
+            margin: 5px 0;
+        }
+        /* Estilo para alinear logo junto al título solo en la sección de traducción */
+        .titulo-con-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .titulo-con-logo h2 {
+            margin-right: 10px;
+        }
+        .logo {
+            width: 30px;  /* Ajustar el tamaño del logo */
+            height: auto;
+        }
+        /* Estilo para el título sobre la imagen en la página de inicio de sesión */
+        .login-container {
+            position: relative;
+        }
+        /* Estilo para el título global */
+        .titulo-global {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Título fuera del login -->
+    <div class="titulo-global">!ndi-Trad</div>
+
+    <div class="container login-container" id="login">
+        <img src="C:\Users\USUARIO\OneDrive - ESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO\Escritorio\SubirP\IOI.jpeg" alt="Login" class="login-image">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" id="usuario" placeholder="Usuario">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="verificarLogin()">Ingresar</button>
+        <p id="mensaje" style="color: red;"></p>
+    </div>
+    <div class="container" id="traductor" style="display: none;">
+        <!-- Título con logo al lado -->
+        <div class="titulo-con-logo">
+            <h2>!ndi-Trad</h2>
+            <img src="C:\Users\USUARIO\OneDrive - ESCUELA SUPERIOR POLITECNICA DE CHIMBORAZO\Escritorio\SubirP\IOI.jpeg" alt="Logo" class="logo">
+        </div>
+        
+        <label for="direccion">Dirección de Traducción:</label>
+        <select id="direccion">
+            <option value="es-a-qi">Español → Quichua</option>
+            <option value="es-a-sh">Español → Shuar</option>
+        </select>
+        <textarea id="entrada" placeholder="Escribe una frase para traducir"></textarea>
+        <button onclick="traducir()">Traducir</button>
+        <div id="resultado-container">
+            <p><strong>Traducción:</strong></p>
+            <span id="resultado"></span>
+        </div>
+        <button onclick="pronunciarTraduccion()">🔊 Pronunciar</button>
+        <button class="btn-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+
+        <!-- Historial de traducciones -->
+        <div id="historial">
+            <h3>Historial de Traducciones:</h3>
+            <div id="historial-lista"></div>
+        </div>
+    </div>
+
+    <div class="vision-mision">
+        <h3>Visión:</h3>
+        <p>Ser una empresa líder en el mercado a nivel local dedicada al desarrollo de Software de traducción.</p>
+        <h3>Misión:</h3>
+        <p>Somos una empresa dedicada a desarrollar software de traducción diseñado para satisfacer las necesidades de estudiantes, turistas e investigadores, facilitando el aprendizaje, la comprensión y la interacción con diversas culturas a través de una plataforma intuitiva, accesible y precisa.</p>
+    </div>
+
+    <script>
+        const usuarioCorrecto = "admin";
+        const passwordCorrecto = "1234";
+        
+        function verificarLogin() {
+            let usuario = document.getElementById("usuario").value.trim();
+            let password = document.getElementById("password").value.trim();
+            
+            if (usuario === usuarioCorrecto && password === passwordCorrecto) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("traductor").style.display = "block";
+            } else {
+                document.getElementById("mensaje").textContent = "Usuario o contraseña incorrectos.";
+            }
+        }
+
+        function cerrarSesion() {
+            document.getElementById("traductor").style.display = "none";
+            document.getElementById("login").style.display = "block";
+            document.getElementById("usuario").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("mensaje").textContent = "";
+        }
+
+        let diccionarioQuichua = {
+            "qué": "ima", "que": "ima",
+            "cuál": "ima", "cual": "ima",
+            "gracias": "pagui",
+            "hola": "imanalla",
+            "adiós": "tupananchikkama", "adios": "tupananchikkama",
+            "amor": "munay",
+            "agua": "yaku",
+            "perro": "ashcu",
+            "sol": "inti",
+            "casa": "huasi",
+            "mujer": "huarmi",
+            "hombre": "huambra",
+            "nombre": "shuti",
+            "vamos": "jacu",
+            "caminar": "purina",
+            "amigo":"mashi"
+        };
+
+        let diccionarioShuar = {
+            "hola": "alli puncha",
+            "buenos días": "puncha tutamanta",
+            "buenas tardes": "chishi puncha",
+            "buenas noches": "tuta puncha",
+            "¿cómo estás?": "imanallatak kangui?",
+            "estoy bien": "ñukaka alli kani",
+            "adiós": "tupanchikkama",
+            "nos vemos": "jukratakama",
+            "sí": "arí",
+            "no": "mana",
+            "por favor": "ama shina kaspaka",
+            "gracias": "pagarachu",
+            "de nada": "mana ima kanchu",
+            "disculpa": "pampachaway",
+            "no entiendo": "mana ñukata atikani",
+            "ayuda": "yanapay",
+            "uno": "shuk",
+            "dos": "ishkay",
+            "tres": "kimsa",
+            "cuatro": "chusku",
+            "cinco": "pichka",
+            "comida": "mikuna",
+            "agua": "yaku",
+            "chicha": "aswa",
+            "plátano": "killu panka",
+            "pescado": "yaku aycha"
+        };
+
+        function traducir() {
+            let textoOriginal = document.getElementById("entrada").value.trim().toLowerCase();
+            let direccion = document.getElementById("direccion").value;
+            let diccionario;
+
+            if (direccion === "es-a-qi") diccionario = diccionarioQuichua;
+            else if (direccion === "es-a-sh") diccionario = diccionarioShuar;
+
+            let resultado = diccionario[textoOriginal] || textoOriginal.split(' ').map(palabra => diccionario[palabra] || palabra).join(' ');
+
+            document.getElementById("resultado").textContent = resultado;
+
+            // Guardar el historial
+            let historialLista = document.getElementById("historial-lista");
+            let historialItem = document.createElement("div");
+            historialItem.className = "historial-item";
+            historialItem.textContent = `Entrada: "${textoOriginal}" → Traducción: "${resultado}"`;
+            historialLista.appendChild(historialItem);
+        }
+
+        function pronunciarTraduccion() {
+            let texto = document.getElementById("resultado").textContent;
+            if (texto.trim() !== "") {
+                let speech = new SpeechSynthesisUtterance(texto);
+                speech.lang = "es-ES"; // Cambia si necesitas otro idioma
+                window.speechSynthesis.speak(speech);
+            }
+        }
+    </script>
+</body>
+</html>
